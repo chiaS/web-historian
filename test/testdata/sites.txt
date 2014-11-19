@@ -1,2 +1,1 @@
-example1.com
-example2.com
+["abc.com","cde.com","xyz.com"]

@@ -65,7 +65,7 @@ describe("Node Server Request Listener Function", function() {
       function(){
         var fileContents = fs.readFileSync(archive.paths.list, 'utf8');
         expect(res._responseCode).to.equal(302);
-        expect(fileContents).to.equal(url + "\n");
+        expect(fileContents).to.equal('[' + url + ']');
         done();
     });
   });
@@ -91,7 +91,7 @@ describe("html fetcher helpers", function(){
     var urlArray = ["example1.com", "example2.com"];
     var resultArray;
 
-    fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
+    fs.writeFileSync(archive.paths.list, JSON.stringify(urlArray));
     archive.readListOfUrls(function(urls){
       resultArray = urls;
     });
@@ -103,6 +103,35 @@ describe("html fetcher helpers", function(){
         done();
     });
   });
+
+  it("should have a 'isUrlInList' function", function(done) {
+    var urlArray = ["abc.com", 'cde.com'];
+    fs.writeFileSync(archive.paths.list, JSON.stringify(urlArray));
+
+    expect(archive.isUrlInList(urlArray[0])).to.equal(true);
+    expect(archive.isUrlInList(urlArray[1])).to.equal(true);
+    expect(archive.isUrlInList("aaa.com") ).to.equal(false);
+    done();
+
+  });
+
+  it("should have a 'addUrlToList' function", function(done){
+    var urlArray = ["abc.com", 'cde.com'];
+    var isDone = false;
+    fs.writeFileSync(archive.paths.list, JSON.stringify(urlArray));
+    archive.addUrlToList('xyz.com', function(){
+      isDone = true;
+    });
+
+
+    waitForThen(
+      function() { return isDone; },
+      function(){
+        expect(archive.isUrlInList('xyz.com')).to.equal(true);
+        done();
+    });
+  });
+
 
   it("should have a 'downloadUrls' function", function(){
     expect(typeof archive.downloadUrls).to.equal('function');
