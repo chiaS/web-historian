@@ -42,7 +42,7 @@ exports.addUrlToList = function(url, callback){
   var list = this.paths.list;
 
   fs.readFile(list, function(err,data){
-    console.log("I SHOULD BE FIRST")
+
     var dataArr = JSON.parse(data.toString());
     dataArr.push(url);
     fs.writeFile(list, JSON.stringify(dataArr), function(err){
@@ -61,7 +61,6 @@ exports.isURLArchived = function(){
 
 exports.downloadUrls = function(url, data){
   var archives = this.paths.archivedSites;
-
   fs.writeFile(archives+url, data, function(err){
     if(err)
       console.log(err);

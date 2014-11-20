@@ -36,14 +36,18 @@ exports.handleRequest = function (req, res) {
     //get url
     req.on('data', function(data){
     //process url
-      console.log("DATA: " + data.slice(4) );
-      processURL(req, res, data.slice(4), 302);
+      processURL(req, res, '/' + data.slice(4), 302);
     });
 
   } else if (req.method === 'GET') {
-    //get url
-    processURL(req, res, req.url, 200);
-    //process url
+    //to see if the requested url is archived
+    if(routes[req.url] === undefined){
+      res.writeHead(404);
+      res.end();
+    }else{
+      processURL(req, res, req.url, 200);
+    }
+
   }
 
 
@@ -51,22 +55,19 @@ exports.handleRequest = function (req, res) {
 
   var processURL = function(req, res, url, statusCode) {
     if (routes[url]) {
-      console.log("PULLING FROM ARCHIVES");
-      console.log(url);
       routes[url](req, res, statusCode);
     } else {
-      console.log("NOT PULLING FROM ARCHIVES");
       routes[url] = sendFile('./../archives/sites'+url);
       //request data from other web servers
       request({uri:'http:/'+url}, function(err, ress, body){
         //save to archive folder
         archive.downloadUrls(url, body);
         //add to list
-        archive.addUrlToList(url);
-        //return page
-        res.writeHead(statusCode);
-        console.log("I SHOULD BE SECOND");
-        res.end(body);
+        archive.addUrlToList(url, function(){
+          //return page
+          res.writeHead(statusCode);
+          res.end(body);
+        });
       });
 
   };
