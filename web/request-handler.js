@@ -33,6 +33,8 @@ fs.readFile(archive.paths.list, function(err, data){
 //respond to our clients
 exports.handleRequest = function (req, res) {
   if(req.method === 'POST'){
+    sendFile('./public/loading.html')(req, res, 200);
+
     //get url
     req.on('data', function(data){
     //process url

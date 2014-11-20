@@ -63,7 +63,7 @@ describe("Node Server Request Listener Function", function() {
     handler.handleRequest(req, res);
 
     waitForThen(
-      function() { return res._ended; },
+      function() { return res._ended && res._responseCode !== 200; },
       function(){
         var fileContents = fs.readFileSync(archive.paths.list, 'utf8');
 
